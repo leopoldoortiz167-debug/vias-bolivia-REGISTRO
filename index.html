@@ -3,126 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vías Bolivia - Sistema Profesional de Recaudación</title>
-    <!-- Tailwind CSS -->
+    <title>Vías Bolivia — Sistema de Recaudación Vial v5.0</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Librería jsPDF y html2pdf para descargas estrictas en PDF -->
+    <!-- html2pdf para reportes ejecutivos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <!-- Configuración PWA para instalar como App -->
-    <meta name="theme-color" content="#1e3a8a">
-    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22V%C3%ADas%20Bolivia%20-%20Recaudaci%C3%B3n%22%2C%22short_name%22%3A%22V%C3%ADas%20Bolivia%22%2C%22start_url%22%3A%22index.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f1f5f9%22%2C%22theme_color%22%3A%22%231e3a8a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fimg.icons8.com%2Fcolor%2F192%2Fcar--v1.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fimg.icons8.com%2Fcolor%2F512%2Fcar--v1.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
-
+    <!-- Configuración PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#030712">
     <style>
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         @media print {
-            body { background: white; }
-            header, nav, button { display: none; }
+            body { background: white !important; color: black !important; }
+            header, nav, button { display: none !important; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-900 font-sans antialiased pb-20">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased pb-32 selection:bg-cyan-600 selection:text-white">
 
-    <!-- Header Principal -->
-    <header class="bg-blue-900 text-white shadow-xl p-4 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🚗</span>
+    <!-- Header Corporativo Superior -->
+    <header class="bg-slate-950/90 backdrop-blur-2xl border-b border-cyan-500/20 sticky top-0 z-50 shadow-2xl shadow-cyan-950/50">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="bg-gradient-to-tr from-cyan-600 to-blue-600 p-2.5 rounded-2xl shadow-lg shadow-cyan-500/30 text-white font-black text-xl">⚡</div>
                 <div>
-                    <h1 class="text-sm font-black tracking-wider">VÍAS BOLIVIA</h1>
-                    <p class="text-[10px] text-blue-200 uppercase tracking-widest">Sistema de Recaudación por Turnos</p>
+                    <h1 class="text-xs font-black tracking-widest text-cyan-400 uppercase">VÍAS BOLIVIA — NÚCLEO DE OPERACIONES VIALES</h1>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Plataforma Inteligente de Recaudación & Auditoría de Turnos</p>
                 </div>
             </div>
-            <nav class="flex flex-wrap justify-center gap-1.5 bg-blue-950 p-1 rounded-xl text-xs sm:text-sm shadow-inner">
-                <button onclick="switchTab('registro')" id="btn-registro" class="px-3 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition">Turnos</button>
-                <button onclick="switchTab('consolidado')" id="btn-consolidado" class="px-3 py-1.5 rounded-lg font-bold text-slate-300 hover:text-white transition">Consolidado</button>
-                <button onclick="switchTab('historial')" id="btn-historial" class="px-3 py-1.5 rounded-lg font-bold text-slate-300 hover:text-white transition">Historial</button>
-                <button onclick="switchTab('reportes')" id="btn-reportes" class="px-3 py-1.5 rounded-lg font-bold text-slate-300 hover:text-white transition">Reportes Fechas</button>
+            <nav class="flex flex-wrap justify-center gap-1.5 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+                <button onclick="switchTab('registro')" id="btn-registro" class="px-4 py-2 rounded-xl font-black text-xs bg-cyan-600 text-white transition shadow-lg shadow-cyan-600/30">Operación Turnos</button>
+                <button onclick="switchTab('consolidado')" id="btn-consolidado" class="px-4 py-2 rounded-xl font-black text-xs text-slate-400 hover:text-white transition">Consolidado Día</button>
+                <button onclick="switchTab('historial')" id="btn-historial" class="px-4 py-2 rounded-xl font-black text-xs text-slate-400 hover:text-white transition">Auditoría / Historial</button>
+                <button onclick="switchTab('reportes')" id="btn-reportes" class="px-4 py-2 rounded-xl font-black text-xs text-slate-400 hover:text-white transition">Reportes Rango</button>
             </nav>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto p-3 sm:p-6">
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
 
-        <!-- ================= SECCIÓN 1: REGISTRO DIARIO POR TURNOS ================= -->
+        <!-- ================= SECCIÓN 1: OPERACIÓN TURNOS ================= -->
         <section id="tab-registro" class="tab-content active space-y-6">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3 border-b pb-2">📋 Datos Generales de la Estación</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <!-- Panel de Configuración General -->
+            <div class="bg-slate-900/60 border border-slate-800/80 p-5 rounded-3xl shadow-xl backdrop-blur-xl">
+                <h2 class="text-xs font-black text-cyan-400 uppercase tracking-wider mb-3.5 border-b border-slate-800/80 pb-2.5 flex items-center gap-2">
+                    <span>🏢</span> Parámetros Operativos de la Estación
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-semibold">
                     <div>
-                        <label class="block font-semibold text-slate-600 mb-1 text-xs">Estación:</label>
-                        <input type="text" id="estacion" value="Yucumo" class="w-full border rounded-xl p-2 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none text-xs font-medium">
+                        <label class="block font-bold text-slate-400 mb-1.5">Estación de Peaje:</label>
+                        <input type="text" id="estacion" value="Yucumo" class="w-full border border-slate-800 rounded-2xl p-3 bg-slate-950 focus:ring-2 focus:ring-cyan-500 outline-none text-white transition">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-600 mb-1 text-xs">Carril:</label>
-                        <input type="text" id="carril" value="VALCO" class="w-full border rounded-xl p-2 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none text-xs font-medium">
+                        <label class="block font-bold text-slate-400 mb-1.5">Carril Asignado:</label>
+                        <input type="text" id="carril" value="VALCO-01" class="w-full border border-slate-800 rounded-2xl p-3 bg-slate-950 focus:ring-2 focus:ring-cyan-500 outline-none text-white transition">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-600 mb-1 text-xs">Fecha de Recaudación:</label>
-                        <input type="date" id="fecha-dia" class="w-full border rounded-xl p-2 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none text-xs font-medium">
+                        <label class="block font-bold text-slate-400 mb-1.5">Fecha de Operación:</label>
+                        <input type="date" id="fecha-dia" class="w-full border border-slate-800 rounded-2xl p-3 bg-slate-950 focus:ring-2 focus:ring-cyan-500 outline-none text-white transition">
                     </div>
                 </div>
             </div>
 
-            <!-- Contenedor de Turnos (1, 2 y 3) -->
+            <!-- Contenedor Dinámico para los 3 Turnos -->
             <div id="turnos-container" class="space-y-6"></div>
 
-            <!-- Total General Turnos Día -->
-            <div class="bg-blue-900 text-white p-4 rounded-2xl shadow-md flex justify-between items-center">
-                <span class="text-xs uppercase font-bold tracking-wider">Gran Total Recaudación 3 Turnos:</span>
-                <span id="gran-total-pantalla" class="text-lg font-black">0.00 Bs</span>
+            <!-- Panel Flotante Global de Cierre -->
+            <div class="bg-gradient-to-r from-cyan-950 via-slate-900 to-blue-950 text-white p-6 rounded-3xl shadow-2xl flex flex-col sm:flex-row justify-between items-center border border-cyan-800/40 gap-4 backdrop-blur-xl">
+                <div class="space-y-0.5">
+                    <span class="text-[10px] uppercase font-black tracking-widest text-cyan-400 block">Total Consolidado de la Jornada (3 Turnos)</span>
+                    <span class="text-xs text-slate-400 font-medium">Suma automática en tiempo real de recaudación neta</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="gran-total-pantalla" class="text-3xl font-black text-cyan-300 tracking-tight">0.00 Bs</span>
+                </div>
             </div>
 
-            <!-- Botones de Acción Global -->
-            <div class="flex flex-wrap gap-3 pt-2">
-                <button onclick="guardarRegistroDiario()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg transition text-xs uppercase tracking-wider flex items-center justify-center gap-2">
-                    💾 Guardar y Consolidar Jornada Completa
+            <!-- Botones de Control Principal -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button onclick="guardarRegistroDiario()" class="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black py-4 px-6 rounded-2xl shadow-xl shadow-cyan-950/50 transition text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                    💾 Consolidar y Guardar Jornada en Base Local
                 </button>
-                <button onclick="limpiarFormularioDia()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg transition text-xs uppercase tracking-wider">
-                    🗑️ Limpiar Todo
+                <button onclick="limpiarFormularioDia()" class="bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 font-bold py-4 px-6 rounded-2xl shadow-xl border border-rose-900/50 transition text-xs uppercase tracking-widest">
+                    🗑️ Reiniciar Todo
                 </button>
             </div>
         </section>
 
-        <!-- ================= SECCIÓN 2: CONSOLIDADOR DE REGISTROS ================= -->
+        <!-- ================= SECCIÓN 2: CONSOLIDADO ================= -->
         <section id="tab-consolidado" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <h2 class="text-xs font-bold text-blue-900 uppercase tracking-wider">📊 Planilla Consolidada Diaria</h2>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <label class="text-xs font-semibold text-slate-600">Fecha:</label>
-                    <input type="date" id="fecha-consolidado-selector" onchange="cargarConsolidadoDia()" class="border rounded-xl p-2 text-xs outline-none bg-slate-50 font-medium">
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-3 backdrop-blur-xl">
+                <h2 class="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                    <span>📊</span> Planilla Consolidada Gerencial
+                </h2>
+                <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                    <label class="text-xs font-bold text-slate-400">Seleccionar Fecha:</label>
+                    <input type="date" id="fecha-consolidado-selector" onchange="cargarConsolidadoDia()" class="border border-slate-800 rounded-2xl p-2.5 text-xs outline-none bg-slate-950 font-semibold text-white">
                 </div>
             </div>
 
             <div id="contenedor-resultado-consolidado" class="space-y-4"></div>
         </section>
 
-        <!-- ================= SECCIÓN 3: HISTORIAL GENERAL ================= -->
+        <!-- ================= SECCIÓN 3: HISTORIAL ================= -->
         <section id="tab-historial" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
-                <h2 class="text-xs font-bold text-blue-900 uppercase tracking-wider">📁 Historial de Jornadas</h2>
-                <button onclick="borrarTodoHistorial()" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-2 rounded-xl font-bold transition">Vaciar Base Local</button>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl shadow-xl flex justify-between items-center backdrop-blur-xl">
+                <h2 class="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                    <span>📁</span> Auditoría e Historial de Jornadas
+                </h2>
+                <button onclick="borrarTodoHistorial()" class="text-xs bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 px-3.5 py-2 rounded-xl font-bold transition border border-rose-500/20">Vaciar Base Local</button>
             </div>
             <div id="lista-historial" class="space-y-4"></div>
         </section>
 
-        <!-- ================= SECCIÓN 4: REPORTES POR RANGO DE FECHAS ================= -->
+        <!-- ================= SECCIÓN 4: REPORTES ================= -->
         <section id="tab-reportes" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                <h2 class="text-xs font-bold text-blue-900 uppercase tracking-wider">📈 Buscador y Resumen por Rango de Fechas</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-4 backdrop-blur-xl">
+                <h2 class="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                    <span>📈</span> Reporte Analítico y Estadístico por Rango
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
                     <div>
-                        <label class="block font-semibold text-slate-600 mb-1 text-xs">Fecha Desde:</label>
-                        <input type="date" id="filtro-desde" class="w-full border rounded-xl p-2 outline-none bg-slate-50 text-xs">
+                        <label class="block font-bold text-slate-400 mb-1.5">Fecha Desde:</label>
+                        <input type="date" id="filtro-desde" class="w-full border border-slate-800 rounded-2xl p-3 outline-none bg-slate-950 text-white">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-600 mb-1 text-xs">Fecha Hasta:</label>
-                        <input type="date" id="filtro-hasta" class="w-full border rounded-xl p-2 outline-none bg-slate-50 text-xs">
+                        <label class="block font-bold text-slate-400 mb-1.5">Fecha Hasta:</label>
+                        <input type="date" id="filtro-hasta" class="w-full border border-slate-800 rounded-2xl p-3 outline-none bg-slate-950 text-white">
                     </div>
                 </div>
-                <button onclick="generarReporteFechas()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow transition text-xs uppercase tracking-wider">
-                    🔍 Generar Reporte Consolidado de Fechas
+                <button onclick="generarReporteFechas()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3.5 rounded-2xl shadow-xl shadow-cyan-600/30 transition text-xs uppercase tracking-widest">
+                    🔍 Procesar Análisis Acumulado
                 </button>
             </div>
 
@@ -131,17 +144,17 @@
 
     </main>
 
-    <!-- Modal de Alerta de Duplicidad Estricta -->
-    <div id="modal-alerta" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl space-y-4 animate-scale">
+    <!-- Modal de Alerta Inteligente por Duplicidad -->
+    <div id="modal-alerta" class="fixed inset-0 bg-slate-950/80 hidden z-50 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl space-y-4">
             <div class="text-4xl">⚠️</div>
-            <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">¡Conflicto de Series Detectado!</h3>
-            <p id="modal-texto-alerta" class="text-xs text-slate-600 leading-relaxed font-medium">Este número o rango de boletos ya fue registrado previamente en otro turno o fecha. El sistema prohíbe estrictamente la duplicidad.</p>
-            <button onclick="cerrarAlerta()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Entendido</button>
+            <h3 class="text-sm font-black text-white uppercase tracking-wider">¡Conflicto de Series Detectado!</h3>
+            <p id="modal-texto-alerta" class="text-xs text-slate-400 leading-relaxed font-semibold">El rango de boletos ingresado ya se encuentra registrado en otro turno o planilla previa. El sistema evita solapamientos.</p>
+            <button onclick="cerrarAlerta()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3 rounded-2xl text-xs uppercase tracking-widest transition">Entendido</button>
         </div>
     </div>
 
-    <!-- Script de Lógica Profesional -->
+    <!-- Script de Lógica Avanzada -->
     <script>
         const cortesBase = [2, 3, 4, 5, 10, 25, 40];
         const turnosNombres = ["PRIMER TURNO", "SEGUNDO TURNO", "TERCER TURNO"];
@@ -150,17 +163,21 @@
         document.getElementById('fecha-dia').value = hoyIso;
         document.getElementById('fecha-consolidado-selector').value = hoyIso;
 
+        window.addEventListener('DOMContentLoaded', () => {
+            renderizarEstructuraTurnos();
+        });
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(el => {
-                el.classList.remove('bg-blue-600', 'text-white');
-                el.classList.add('text-slate-300');
+                el.classList.remove('bg-cyan-600', 'text-white', 'shadow-lg', 'shadow-cyan-600/30');
+                el.classList.add('text-slate-400');
             });
 
             document.getElementById(`tab-${tabId}`).classList.add('active');
             const activeBtn = document.getElementById(`btn-${tabId}`);
-            activeBtn.classList.add('bg-blue-600', 'text-white');
-            activeBtn.classList.remove('text-slate-300');
+            activeBtn.classList.add('bg-cyan-600', 'text-white', 'shadow-lg', 'shadow-cyan-600/30');
+            activeBtn.classList.remove('text-slate-400');
 
             if(tabId === 'historial') cargarHistorial();
             if(tabId === 'consolidado') cargarConsolidadoDia();
@@ -173,55 +190,57 @@
             turnosNombres.forEach((turno, index) => {
                 let turnoNum = index + 1;
                 html += `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
-                        <h3 class="font-black text-blue-900 text-xs uppercase tracking-wider">🕒 ${turno}</h3>
+                <div class="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800/80 pb-3">
+                        <h3 class="font-black text-cyan-400 text-xs uppercase tracking-wider flex items-center gap-2">
+                            <span>🕒</span> ${turno}
+                        </h3>
                         <div class="w-full sm:w-auto flex items-center gap-2">
-                            <span class="text-xs font-semibold text-slate-500">Recaudador:</span>
-                            <input type="text" id="recaudador-${turnoNum}" placeholder="Nombre completo del funcionario" class="border rounded-xl p-2 text-xs flex-1 sm:w-64 outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50 font-medium">
+                            <span class="text-xs font-bold text-slate-400">Recaudador:</span>
+                            <input type="text" id="recaudador-${turnoNum}" placeholder="Nombre del Funcionario" class="border border-slate-800 rounded-2xl p-2 text-xs flex-1 sm:w-60 outline-none focus:ring-1 focus:ring-cyan-500 bg-slate-950 font-semibold text-white">
                         </div>
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-slate-100 text-slate-700 font-bold">
-                                    <th class="p-2 border">Serie / Boleto</th>
-                                    <th class="p-2 border">Del</th>
-                                    <th class="p-2 border">Al</th>
-                                    <th class="p-2 border text-center">Boletos</th>
-                                    <th class="p-2 border">Corte (Bs)</th>
-                                    <th class="p-2 border">Total (Bs)</th>
-                                    <th class="p-2 border text-center">✕</th>
+                                <tr class="bg-slate-950 text-slate-400 font-bold border-b border-slate-800">
+                                    <th class="p-2.5 rounded-l-xl">Serie</th>
+                                    <th class="p-2.5">Del</th>
+                                    <th class="p-2.5">Al</th>
+                                    <th class="p-2.5 text-center">Boletos</th>
+                                    <th class="p-2.5">Corte (Bs)</th>
+                                    <th class="p-2.5">Total (Bs)</th>
+                                    <th class="p-2.5 text-center rounded-r-xl">✕</th>
                                 </tr>
                             </thead>
-                            <tbody id="filas-turno-${turnoNum}"></tbody>
+                            <tbody id="filas-turno-${turnoNum}" class="divide-y divide-slate-800/40"></tbody>
                         </table>
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
-                        <button onclick="agregarFila(${turnoNum})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs transition">
-                            ➕ Añadir Corte
+                        <button onclick="agregarFila(${turnoNum})" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2 rounded-2xl text-xs transition border border-slate-700/60 shadow">
+                            ➕ Añadir Rango
                         </button>
-                        <div class="text-right font-black text-xs text-slate-700">
-                            Total Turno (${turnoNum}): <span id="total-turno-${turnoNum}" class="text-blue-600 text-sm">0.00</span> Bs
+                        <div class="text-right font-black text-xs text-slate-300">
+                            Total Turno (${turnoNum}): <span id="total-turno-${turnoNum}" class="text-cyan-400 text-sm">0.00</span> Bs
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 bg-slate-50 p-3 rounded-xl text-xs border">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-3 bg-slate-950/80 p-4 rounded-2xl text-xs border border-slate-800/80">
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Efectivo Real en Caja (Bs):</label>
-                            <input type="number" step="0.5" id="efectivo-${turnoNum}" oninput="calcularDiferencias(${turnoNum})" class="w-full border rounded-xl p-2 bg-white outline-none font-bold text-slate-800">
+                            <label class="block font-bold text-slate-400 mb-1">Efectivo Real en Caja (Bs):</label>
+                            <input type="number" step="0.5" id="efectivo-${turnoNum}" oninput="calcularDiferencias(${turnoNum})" class="w-full border border-slate-800 rounded-2xl p-2.5 bg-slate-900 outline-none font-bold text-white focus:ring-1 focus:ring-cyan-500">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Efectivo Sobrante / Faltante:</label>
-                            <div class="p-2 bg-white rounded-xl border font-bold" id="caja-dif-box-${turnoNum}">
+                            <label class="block font-bold text-slate-400 mb-1">Balance (Sobrante/Faltante):</label>
+                            <div class="p-2.5 bg-slate-900 rounded-2xl border border-slate-800 font-bold flex items-center">
                                 <span id="dif-${turnoNum}">0.00 Bs</span>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Firma / Validación:</label>
-                            <input type="text" id="firma-${turnoNum}" placeholder="Firma / VoBo" class="w-full border rounded-xl p-2 bg-white outline-none text-xs">
+                            <label class="block font-bold text-slate-400 mb-1">Vo.Bo. / Firma Supervisor:</label>
+                            <input type="text" id="firma-${turnoNum}" placeholder="Nombre / Código Supervisor" class="w-full border border-slate-800 rounded-2xl p-2.5 bg-slate-900 outline-none text-xs font-semibold text-white focus:ring-1 focus:ring-cyan-500">
                         </div>
                     </div>
                 </div>`;
@@ -239,16 +258,16 @@
             
             const tr = document.createElement('tr');
             tr.id = rowId;
-            tr.className = "border-b hover:bg-slate-50/50";
+            tr.className = "hover:bg-slate-800/30 transition";
             tr.innerHTML = `
-                <td class="p-2 border"><input type="text" placeholder="Ej. VB02026" class="w-24 border rounded p-1.5 text-xs outline-none font-medium serie-input"></td>
-                <td class="p-2 border"><input type="number" value="${delDefault}" oninput="calcularFila('${rowId}', ${turnoNum})" class="w-20 border rounded p-1.5 text-xs outline-none font-medium del-input"></td>
-                <td class="p-2 border"><input type="number" value="${alDefault}" oninput="calcularFila('${rowId}', ${turnoNum})" class="w-20 border rounded p-1.5 text-xs outline-none font-medium al-input"></td>
-                <td class="p-2 border text-center font-bold cantidad-cell">0</td>
-                <td class="p-2 border"><input type="number" step="0.5" value="${corteDefault}" oninput="calcularFila('${rowId}', ${turnoNum})" class="w-20 border rounded p-1.5 text-xs outline-none font-medium corte-input"></td>
-                <td class="p-2 border font-bold total-cell text-blue-900">0.00</td>
-                <td class="p-2 border text-center">
-                    <button onclick="eliminarFila('${rowId}', ${turnoNum})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1">✕</button>
+                <td class="p-2"><input type="text" placeholder="Ej. A" class="w-24 border border-slate-800 rounded-xl p-2 text-xs outline-none font-semibold bg-slate-950 text-white serie-input"></td>
+                <td class="p-2"><input type="number" value="${delDefault}" oninput="calcularFila('${rowId}', ${turnoNum})" class="w-20 border border-slate-800 rounded-xl p-2 text-xs outline-none font-semibold bg-slate-950 text-white del-input"></td>
+                <td class="p-2"><input type="number" value="${alDefault}" oninput="calcularFila('${rowId}', ${turnoNum})" class="w-20 border border-slate-800 rounded-xl p-2 text-xs outline-none font-semibold bg-slate-950 text-white al-input"></td>
+                <td class="p-2 text-center font-bold cantidad-cell text-slate-300">0</td>
+                <td class="p-2"><input type="number" step="0.5" value="${corteDefault}" oninput="calcularFila('${rowId}', ${turnoNum})" class="w-20 border border-slate-800 rounded-xl p-2 text-xs outline-none font-semibold bg-slate-950 text-white corte-input"></td>
+                <td class="p-2 font-black total-cell text-cyan-400">0.00</td>
+                <td class="p-2 text-center">
+                    <button onclick="eliminarFila('${rowId}', ${turnoNum})" class="text-rose-400 hover:text-rose-300 font-bold px-2 py-1">✕</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -346,7 +365,7 @@
             const dif = efectivoCaja - totalVenta;
             const spanDif = document.getElementById(`dif-${turnoNum}`);
             spanDif.textContent = `${dif >= 0 ? '+' : ''}${dif.toFixed(2)} Bs`;
-            spanDif.className = `font-bold text-xs ${dif < 0 ? 'text-rose-600' : 'text-emerald-600'}`;
+            spanDif.className = `font-bold text-xs ${dif < 0 ? 'text-rose-400' : 'text-emerald-400'}`;
         }
 
         function recalcularGranTotalGeneral() {
@@ -363,7 +382,7 @@
             const carril = document.getElementById('carril').value;
 
             if(!fecha) {
-                alert('Por favor selecciona una fecha.');
+                alert('Debe especificar una fecha válida.');
                 return;
             }
 
@@ -426,13 +445,13 @@
             historial.push(registroCompleto);
             localStorage.setItem('vias_bolivia_registros', JSON.stringify(historial));
 
-            alert('¡Jornada guardada y consolidada con éxito!');
+            alert('¡Jornada consolidada con éxito!');
             document.getElementById('fecha-consolidado-selector').value = fecha;
             switchTab('consolidado');
         }
 
         function limpiarFormularioDia() {
-            if(confirm('¿Deseas limpiar todos los turnos actuales de la pantalla?')) {
+            if(confirm('¿Desea vaciar los campos actuales de la pantalla?')) {
                 renderizarEstructuraTurnos();
             }
         }
@@ -444,34 +463,34 @@
             const contenedor = document.getElementById('contenedor-resultado-consolidado');
 
             if(!reg) {
-                contenedor.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-slate-500 shadow-sm border text-xs">No hay registros consolidados para la fecha: <b>${fechaSel}</b>.</div>`;
+                contenedor.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl text-center text-slate-400 text-xs font-semibold">No se encontraron registros consolidados para la fecha: <b>${fechaSel}</b>.</div>`;
                 return;
             }
 
             let html = `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-6" id="seccion-consolidado-imprimible">
+            <div class="bg-white text-slate-900 rounded-3xl shadow-2xl p-6 space-y-6" id="seccion-consolidado-imprimible">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-2">
                     <div>
-                        <h3 class="font-black text-blue-900 text-sm uppercase tracking-wider">VÍAS BOLIVIA — REPORTE OFICIAL CONSOLIDADO</h3>
-                        <p class="text-xs text-slate-500 font-semibold">Estación: ${reg.estacion} | Carril: ${reg.carril} | Fecha: ${reg.fecha}</p>
+                        <h3 class="font-black text-cyan-900 text-sm uppercase tracking-wider">VÍAS BOLIVIA — REPORTE OFICIAL CONSOLIDADO</h3>
+                        <p class="text-xs text-slate-600 font-bold">Estación: ${reg.estacion} | Carril: ${reg.carril} | Fecha: ${reg.fecha}</p>
                     </div>
-                    <button onclick="descargarPDFConsolidado('${reg.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-1.5 uppercase tracking-wider">
-                        📥 Descargar PDF Oficial / Imprimir
+                    <button onclick="descargarPDFConsolidado()" class="no-print bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4.5 py-3 rounded-2xl shadow-lg transition flex items-center gap-2 uppercase tracking-wider">
+                        📥 Descargar PDF Oficial
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div class="bg-blue-50 p-3.5 rounded-2xl border border-blue-100">
-                        <span class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">Total Boletos Vendidos Día</span>
-                        <p class="text-lg font-black text-blue-900">${reg.totalBoletos} boletos</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div class="bg-cyan-50 p-4 rounded-2xl border border-cyan-100">
+                        <span class="text-[10px] text-cyan-600 font-black uppercase tracking-wider">Total Boletos Vendidos</span>
+                        <p class="text-xl font-black text-cyan-900">${reg.totalBoletos} boletos</p>
                     </div>
-                    <div class="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-100">
-                        <span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Recaudación Total 3 Turnos</span>
-                        <p class="text-lg font-black text-emerald-900">${reg.granTotal.toFixed(2)} Bs</p>
+                    <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+                        <span class="text-[10px] text-emerald-600 font-black uppercase tracking-wider">Recaudación 3 Turnos</span>
+                        <p class="text-xl font-black text-emerald-900">${reg.granTotal.toFixed(2)} Bs</p>
                     </div>
-                    <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                        <span class="text-[10px] text-slate-600 font-bold uppercase tracking-wider">Estado de Jornada</span>
-                        <p class="text-lg font-black text-slate-800">Cerrada OK</p>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <span class="text-[10px] text-slate-600 font-black uppercase tracking-wider">Estado de Jornada</span>
+                        <p class="text-xl font-black text-slate-800">Cerrada OK</p>
                     </div>
                 </div>
 
@@ -479,40 +498,40 @@
 
             reg.turnos.forEach(t => {
                 html += `
-                <div class="bg-slate-50 p-4 rounded-xl border space-y-3">
+                <div class="bg-slate-50 p-4.5 rounded-2xl border border-slate-200 space-y-3">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs font-bold text-slate-800 border-b pb-2 gap-1">
-                        <span>TURNO ${t.turnoNum} — RECAUDADOR: <span class="text-blue-700 font-black">${t.recaudador}</span></span>
-                        <span class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-lg">Recaudación: ${t.totalVenta.toFixed(2)} Bs | Efectivo: ${t.efectivo} Bs</span>
+                        <span>TURNO ${t.turnoNum} — RECAUDADOR: <span class="text-cyan-700 font-black">${t.recaudador}</span></span>
+                        <span class="bg-cyan-100 text-cyan-900 px-3 py-1 rounded-xl font-black">Venta: ${t.totalVenta.toFixed(2)} Bs | Efectivo: ${t.efectivo} Bs</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="text-slate-500 bg-slate-200/60 font-bold">
-                                    <th class="p-1.5 border">Serie</th>
-                                    <th class="p-1.5 border">Del</th>
-                                    <th class="p-1.5 border">Al</th>
-                                    <th class="p-1.5 border">Cantidad</th>
-                                    <th class="p-1.5 border">Corte</th>
-                                    <th class="p-1.5 border">Total (Bs)</th>
+                                    <th class="p-2 border rounded-l-lg">Serie</th>
+                                    <th class="p-2 border">Del</th>
+                                    <th class="p-2 border">Al</th>
+                                    <th class="p-2 border">Cantidad</th>
+                                    <th class="p-2 border">Corte</th>
+                                    <th class="p-2 border rounded-r-lg">Total (Bs)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${t.detalles.map(d => `
                                     <tr>
-                                        <td class="p-1.5 border font-medium">${d.serie}</td>
-                                        <td class="p-1.5 border font-medium">${d.del}</td>
-                                        <td class="p-1.5 border font-medium">${d.al}</td>
-                                        <td class="p-1.5 border font-bold">${d.cantidad}</td>
-                                        <td class="p-1.5 border font-medium">${d.corte}</td>
-                                        <td class="p-1.5 border font-black text-blue-900">${d.total.toFixed(2)}</td>
+                                        <td class="p-2 border font-semibold">${d.serie}</td>
+                                        <td class="p-2 border font-semibold">${d.del}</td>
+                                        <td class="p-2 border font-semibold">${d.al}</td>
+                                        <td class="p-2 border font-bold">${d.cantidad}</td>
+                                        <td class="p-2 border font-semibold">${d.corte}</td>
+                                        <td class="p-2 border font-black text-cyan-900">${d.total.toFixed(2)}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
                         </table>
                     </div>
                     <div class="flex justify-between items-center text-[11px] font-bold text-slate-600 pt-1">
-                        <span>Diferencia Caja: <span class="${t.diferencias < 0 ? 'text-rose-600 font-black' : 'text-emerald-600 font-black'}">${t.diferencias >= 0 ? '+' : ''}${t.diferencias.toFixed(2)} Bs</span></span>
-                        <span>Firma: ____________________</span>
+                        <span>Balance: <span class="${t.diferencias < 0 ? 'text-rose-600 font-black' : 'text-emerald-600 font-black'}">${t.diferencias >= 0 ? '+' : ''}${t.diferencias.toFixed(2)} Bs</span></span>
+                        <span>Vo.Bo. Supervisor: <span class="text-slate-900 font-semibold">${t.firma || '____________________'}</span></span>
                     </div>
                 </div>`;
             });
@@ -521,11 +540,11 @@
             contenedor.innerHTML = html;
         }
 
-        function descargarPDFConsolidado(id) {
+        function descargarPDFConsolidado() {
             const elemento = document.getElementById('seccion-consolidado-imprimible');
             const opt = {
-                margin:       0.4,
-                filename:     `Consolidado_Oficial_Vias_Bolivia.pdf`,
+                margin:       0.3,
+                filename:     `Consolidado_Vias_Bolivia.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -538,7 +557,7 @@
             const contenedor = document.getElementById('lista-historial');
 
             if(historial.length === 0) {
-                contenedor.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-slate-500 shadow-sm border text-xs">No hay jornadas guardadas.</div>`;
+                contenedor.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl text-center text-slate-400 text-xs font-semibold">No hay jornadas almacenadas en el sistema.</div>`;
                 return;
             }
 
@@ -547,163 +566,77 @@
             let html = '';
             historial.forEach(reg => {
                 html += `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-2 gap-2">
-                        <div>
-                            <h3 class="font-black text-blue-900 text-xs">FECHA: ${reg.fecha}</h3>
-                            <p class="text-[11px] text-slate-500 font-medium">Estación: ${reg.estacion} | Boletos: ${reg.totalBoletos}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-xl">Total: ${reg.granTotal.toFixed(2)} Bs</span>
-                            <button onclick="verConsolidadoFecha('${reg.fecha}')" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow">Ver</button>
-                            <button onclick="eliminarRegistro('${reg.id}')" class="text-rose-500 font-bold p-1">🗑️</button>
-                        </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-xl">
+                    <div>
+                        <h3 class="font-black text-cyan-400 text-xs">FECHA: ${reg.fecha}</h3>
+                        <p class="text-[11px] text-slate-400 font-bold">Estación: ${reg.estacion} | Carril: ${reg.carril} | Boletos: ${reg.totalBoletos}</p>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-between">
+                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-black px-3.5 py-1.5 rounded-2xl">${reg.granTotal.toFixed(2)} Bs</span>
+                        <button onclick="verHistorialFecha('${reg.fecha}')" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">Ver Consolidado</button>
                     </div>
                 </div>`;
             });
             contenedor.innerHTML = html;
         }
 
-        function verConsolidadoFecha(fecha) {
+        function verHistorialFecha(fecha) {
             document.getElementById('fecha-consolidado-selector').value = fecha;
             switchTab('consolidado');
         }
 
-        function eliminarRegistro(id) {
-            if(confirm('¿Eliminar esta jornada del historial?')) {
-                let historial = JSON.parse(localStorage.getItem('vias_bolivia_registros') || '[]');
-                historial = historial.filter(r => r.id !== id);
-                localStorage.setItem('vias_bolivia_registros', JSON.stringify(historial));
-                cargarHistorial();
-            }
-        }
-
         function borrarTodoHistorial() {
-            if(confirm('¿Vaciar todo el historial guardado?')) {
+            if(confirm('¿Desea vaciar por completo el historial de registros de la base local?')) {
                 localStorage.removeItem('vias_bolivia_registros');
                 cargarHistorial();
+                alert('Historial eliminado.');
             }
         }
 
         function generarReporteFechas() {
             const desde = document.getElementById('filtro-desde').value;
             const hasta = document.getElementById('filtro-hasta').value;
+            const contenedor = document.getElementById('resultado-reporte-fechas');
 
             if(!desde || !hasta) {
-                alert('Selecciona un rango de fechas válido.');
+                alert('Seleccione un intervalo de fechas (Desde y Hasta).');
                 return;
             }
 
             const historial = JSON.parse(localStorage.getItem('vias_bolivia_registros') || '[]');
             const filtrados = historial.filter(r => r.fecha >= desde && r.fecha <= hasta);
-            const contenedor = document.getElementById('resultado-reporte-fechas');
 
             if(filtrados.length === 0) {
-                contenedor.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-slate-500 shadow-sm border text-xs">No hay registros en el rango seleccionado.</div>`;
+                contenedor.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl text-center text-slate-400 text-xs font-semibold">No se encontraron registros en el rango de fechas seleccionado.</div>`;
                 return;
             }
 
-            let sumaTotal = 0;
-            let sumaBoletos = 0;
+            let sumaGlobalRango = 0;
+            let totalBoletosRango = 0;
             filtrados.forEach(r => {
-                sumaTotal += r.granTotal;
-                sumaBoletos += r.totalBoletos;
+                sumaGlobalRango += r.granTotal;
+                totalBoletosRango += r.totalBoletos;
             });
 
             let html = `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4" id="seccion-reporte-rango">
-                <div class="flex justify-between items-center border-b pb-3">
-                    <div>
-                        <h3 class="font-black text-blue-900 text-xs uppercase tracking-wider">RESUMEN POR RANGO DE FECHAS</h3>
-                        <p class="text-[11px] text-slate-500 font-medium">Del ${desde} al ${hasta}</p>
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+                <h3 class="font-black text-cyan-400 text-xs uppercase tracking-wider border-b border-slate-800 pb-2">📈 Reporte Acumulado (${desde} al ${hasta})</h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                        <span class="text-[10px] text-cyan-400 font-black uppercase">Recaudación Total en el Rango</span>
+                        <p class="text-lg font-black text-white">${sumaGlobalRango.toFixed(2)} Bs</p>
                     </div>
-                    <button onclick="descargarPDFRango()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow uppercase tracking-wider">📥 Descargar PDF</button>
+                    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                        <span class="text-[10px] text-emerald-400 font-black uppercase">Total Boletos Vendidos</span>
+                        <p class="text-lg font-black text-white">${totalBoletosRango} boletos</p>
+                    </div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-700 font-bold">
-                                <th class="p-2 border">Fecha</th>
-                                <th class="p-2 border">Estación</th>
-                                <th class="p-2 border text-center">Boletos</th>
-                                <th class="p-2 border text-right">Total (Bs)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filtrados.map(r => `
-                                <tr>
-                                    <td class="p-2 border font-bold">${r.fecha}</td>
-                                    <td class="p-2 border font-medium">${r.estacion}</td>
-                                    <td class="p-2 border text-center font-bold">${r.totalBoletos}</td>
-                                    <td class="p-2 border text-right font-black text-blue-900">${r.granTotal.toFixed(2)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="flex justify-between items-center border-t pt-3 font-black text-xs text-blue-900">
-                    <span>TOTAL BOLETOS PERÍODO: ${sumaBoletos}</span>
-                    <span class="text-sm">TOTAL RECAUDADO: ${sumaTotal.toFixed(2)} Bs</span>
-                </div>
+                <div class="text-xs font-bold text-slate-400 pt-2">Jornadas registradas en el periodo analizado: ${filtrados.length}</div>
             </div>`;
-
             contenedor.innerHTML = html;
         }
-
-        function descargarPDFRango() {
-            const elemento = document.getElementById('seccion-reporte-rango');
-            const opt = {
-                margin:       0.4,
-                filename:     `Resumen_Fechas_Vias_Bolivia.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            html2pdf().from(elemento).set(opt).save();
-        }
-
-        // Inicializar estructura al arrancar
-        renderizarEstructuraTurnos();
-    </script>
-</body>
-</html>
-<script>
-        // ... (todo tu script actual se mantiene) ...
-
-        // --- INICIO DE IMPLEMENTACIÓN PWA ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swCode = `
-                    const CACHE_NAME = 'vias-bolivia-v1';
-                    const ASSETS = [
-                        '/',
-                        '/index.html',
-                        'https://cdn.tailwindcss.com',
-                        'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
-                    ];
-
-                    self.addEventListener('install', (e) => {
-                        e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
-                    });
-
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(
-                            caches.match(e.request).then((res) => res || fetch(e.request))
-                        );
-                    });
-                `;
-                
-                const blob = new Blob([swCode], { type: 'text/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-
-                navigator.serviceWorker.register(swUrl)
-                    .then(() => console.log('Service Worker registrado correctamente.'))
-                    .catch((err) => console.log('Error al registrar Service Worker:', err));
-            });
-        }
-        // --- FIN DE IMPLEMENTACIÓN PWA ---
     </script>
 </body>
 </html>
