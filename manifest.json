@@ -1,0 +1,20 @@
+{
+  "name": "Vias Bolivia - Recaudación",
+  "short_name": "ViasBolivia",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/color/192/car--v1.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://img.icons8.com/color/512/car--v1.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
