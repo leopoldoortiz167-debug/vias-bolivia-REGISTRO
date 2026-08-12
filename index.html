@@ -669,3 +669,41 @@
     </script>
 </body>
 </html>
+<script>
+        // ... (todo tu script actual se mantiene) ...
+
+        // --- INICIO DE IMPLEMENTACIÓN PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'vias-bolivia-v1';
+                    const ASSETS = [
+                        '/',
+                        '/index.html',
+                        'https://cdn.tailwindcss.com',
+                        'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
+                    ];
+
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+                    });
+
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            caches.match(e.request).then((res) => res || fetch(e.request))
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log('Service Worker registrado correctamente.'))
+                    .catch((err) => console.log('Error al registrar Service Worker:', err));
+            });
+        }
+        // --- FIN DE IMPLEMENTACIÓN PWA ---
+    </script>
+</body>
+</html>
